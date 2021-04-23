@@ -30,6 +30,14 @@ app.post("/samples", async (req, res) => {
 });
 
 app.post("/users", async (req, res) => {
+  const username = req.body.username
+
+  if (!username) {
+    return res
+      .status(400)
+      .json({ errors: ["username is not provided"] });
+  }
+
   return res.status(200).end();
 });
 
