@@ -30,28 +30,24 @@ app.post("/samples", async (req, res) => {
 });
 
 app.post("/users", async (req, res) => {
-  const username = req.body.username
+  const username = req.body.username;
 
   if (!username) {
-    return res
-      .status(400)
-      .json({ errors: ["username is not provided"] });
+    return res.status(400).json({ errors: ["username is not provided"] });
   }
 
   const db = await getDb();
+  const foundUser = await db
+    .collection("users")
+    .findOne({ username: { $eq: username } });
 
-  const foundUser = await db.collection("users").findOne({ username: { $eq: username } });
   if (foundUser) {
-    return res
-      .status(400)
-      .json({ errors: ["username already in use"] });
+    return res.status(400).json({ errors: ["username already in use"] });
   }
 
-  await db
-    .collection("users")
-    .insertOne({ username });
+  const { insertedId } = await db.collection("users").insertOne({ username });
 
-  return res.status(200).end();
+  return res.status(200).json({ message: "user created", id: insertedId });
 });
 
 app.delete("/samples", async (req, res) => {

@@ -17,13 +17,15 @@ describe("Dummy test", () => {
     expect(JSON.parse(text)).toEqual({ message: "aupa ahi" });
   });
 
-  it("POST /users works if username is provided", async () => {
-    const res = await request(app).post("/users")
-      .send({ username: 'john' });
+  it("POST /users create a new user", async () => {
+    const res = await request(app).post("/users").send({ username: "john" });
 
-    const { status } = res;
+    const { status, text } = res;
+    const json = JSON.parse(text);
 
     expect(status).toEqual(200);
+    expect(json.id).toBeDefined();
+    expect(json.message).toEqual("user created");
   });
 
   it("POST /users fails if username is not provided", async () => {
@@ -31,20 +33,18 @@ describe("Dummy test", () => {
 
     const { status, text } = res;
 
-    const json = JSON.parse(text)
+    const json = JSON.parse(text);
 
     expect(status).toEqual(400);
-    expect(json.errors).toEqual(["username is not provided"])
+    expect(json.errors).toEqual(["username is not provided"]);
   });
 
   it("POST /users fails if username is already in use", async () => {
-    await request(app).post("/users")
-      .send({ username: 'john' });
-    const res = await request(app).post("/users")
-      .send({ username: 'john' });
+    await request(app).post("/users").send({ username: "john" });
+    const res = await request(app).post("/users").send({ username: "john" });
     const { status, text } = res;
-    const json = JSON.parse(text)
+    const json = JSON.parse(text);
     expect(status).toEqual(400);
-    expect(json.errors).toEqual(["username already in use"])
+    expect(json.errors).toEqual(["username already in use"]);
   });
 });
