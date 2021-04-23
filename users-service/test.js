@@ -89,6 +89,29 @@ describe('Dummy test', () => {
       expect(body.errors).toHaveLength(1)
       expect(body.errors[0]).toBe('email not valid')
     })
+
+    it('Response includes all validation errors', async () => {
+      const payload = {
+        username: 'Aaron',
+        email: 'aaron',
+        password: '123'
+      }
+      await request(app).post('/users').send(payload)
+      const res = await request(app).post('/users').send(payload)
+
+      const { status, text } = res
+      const body = JSON.parse(text)
+
+      expect(status).toEqual(400)
+      expect(body).toHaveProperty('errors')
+      expect(body.errors).toHaveLength(2)
+      expect(body.errors).toEqual(
+        expect.arrayContaining([
+          'password must have 8 or more characters',
+          'email not valid'
+        ])
+      )
+    })
   })
 
 })
