@@ -40,4 +40,12 @@ app.delete('/samples', async (req, res) => {
   return res.json({ deletedCount, result })
 })
 
+app.post('/users', async (req, res) => {
+  console.log('POST /users', req.body)
+
+  const db = await getDb()
+  const { insertedId } = await db.collection('users').insertOne(req.body)
+  return res.json({ message: 'user created', id: insertedId })
+})
+
 module.exports = app
