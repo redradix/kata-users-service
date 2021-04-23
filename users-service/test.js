@@ -5,7 +5,7 @@ const getDb = require("./db");
 
 describe("Dummy test", () => {
   afterEach(async () => {
-    await getDb().collection("users").removeMany({});
+    (await getDb()).collection("users").removeMany({});
   });
 
   it("GET /", async () => {
