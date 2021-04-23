@@ -1,7 +1,9 @@
 const express = require('express')
 const bodyParser = require('body-parser')
+const UserRepository = require('./repository/user')
 
 const App = (db) => {
+  const userRepository = UserRepository(db)
 
   const app = express()
   app.use(bodyParser.json())
@@ -55,7 +57,7 @@ const App = (db) => {
       return res.status(400).json({ errors })
     }
 
-    const isUsernameAlreadyUsed = await db.collection('users').findOne({ username: req.body.username })
+    const isUsernameAlreadyUsed = await userRepository.getUserByUsername(req.body.username)
     if (isUsernameAlreadyUsed) {
       return res.status(400).json({ errors: ['username already in use'] })
     }
