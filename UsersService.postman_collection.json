@@ -1,0 +1,45 @@
+{
+	"info": {
+		"_postman_id": "907f55ae-e9d4-475a-85a8-30a77b441372",
+		"name": "UsersService",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Get samples",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "localhost:3000/samples"
+			},
+			"response": []
+		},
+		{
+			"name": "Post sample",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"bla\": \"triki\",\n    \"ble\": \"traun\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "localhost:3000/samples"
+			},
+			"response": []
+		},
+		{
+			"name": "Delete all samples",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": "localhost:3000/samples"
+			},
+			"response": []
+		}
+	]
+}
