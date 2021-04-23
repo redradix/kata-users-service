@@ -44,6 +44,12 @@ app.post('/users', async (req, res) => {
   console.log('POST /users', req.body)
 
   const db = await getDb()
+
+  const isUsernameAlreadyUsed = await db.collection('users').findOne({ username: req.body.username })
+  if (isUsernameAlreadyUsed) {
+    return res.status(400).json({ errors: ['username already in use'] })
+  }
+
   const { insertedId } = await db.collection('users').insertOne(req.body)
   return res.json({ message: 'user created', id: insertedId })
 })
