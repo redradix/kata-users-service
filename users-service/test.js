@@ -1,8 +1,15 @@
 const request = require('supertest')
 
 const app = require('./api')
+const getDb = require('./db')
+
 
 describe('Dummy test', () => {
+
+  afterEach(async () => {
+    const db = await getDb('production')
+    db.collection('users').removeMany({})
+  })
 
   it('GET /', async () => {
     const res = await request(app).get('/')
