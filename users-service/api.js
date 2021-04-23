@@ -57,7 +57,7 @@ const App = (db) => {
       return res.status(400).json({ errors })
     }
 
-    const isUsernameAlreadyUsed = await userRepository.getUserByUsername(req.body.username)
+    const isUsernameAlreadyUsed = await userRepository.getByUsername(req.body.username)
     if (isUsernameAlreadyUsed) {
       return res.status(400).json({ errors: ['username already in use'] })
     }

@@ -1,5 +1,5 @@
 const UserRepository = (db) => ({
-  getUserByUsername: (username) => db.collection('users').findOne({ username }),
+  getByUsername: (username) => db.collection('users').findOne({ username }),
   create: (user) => db.collection('users').insertOne(user),
 })
 
