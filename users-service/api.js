@@ -62,7 +62,7 @@ const App = (db) => {
       return res.status(400).json({ errors: ['username already in use'] })
     }
 
-    const { insertedId } = await db.collection('users').insertOne(req.body)
+    const { insertedId } = await userRepository.create(req.body)
     return res.json({ message: 'user created', id: insertedId })
   })
 
