@@ -38,6 +38,19 @@ app.post("/users", async (req, res) => {
       .json({ errors: ["username is not provided"] });
   }
 
+  const db = await getDb();
+
+  const foundUser = await db.collection("users").findOne({ username: { $eq: username } });
+  if (foundUser) {
+    return res
+      .status(400)
+      .json({ errors: ["username already in use"] });
+  }
+
+  await db
+    .collection("users")
+    .insertOne({ username });
+
   return res.status(200).end();
 });
 

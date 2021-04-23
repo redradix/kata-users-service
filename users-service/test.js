@@ -36,4 +36,15 @@ describe("Dummy test", () => {
     expect(status).toEqual(400);
     expect(json.errors).toEqual(["username is not provided"])
   });
+
+  it("POST /users fails if username is already in use", async () => {
+    await request(app).post("/users")
+      .send({ username: 'john' });
+    const res = await request(app).post("/users")
+      .send({ username: 'john' });
+    const { status, text } = res;
+    const json = JSON.parse(text)
+    expect(status).toEqual(400);
+    expect(json.errors).toEqual(["username already in use"])
+  });
 });
