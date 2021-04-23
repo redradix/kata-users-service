@@ -48,6 +48,12 @@ app.post("/users", async (req, res) => {
     return res.status(400).json({ errors: ["email not valid"] });
   }
 
+  const password = req.body.password;
+
+  if (password.length < 8) {
+    return res.status(400).json({ errors: ["password must have 8 or more characters"] });
+  }
+
   const db = await getDb();
   const foundUser = await db
     .collection("users")

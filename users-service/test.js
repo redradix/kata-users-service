@@ -6,6 +6,7 @@ const getDb = require("./db");
 const MOCK_USER = {
   username: "john",
   email: 'john@example.com',
+  password: 'password'
 }
 
 describe("Dummy test", () => {
@@ -76,6 +77,21 @@ describe("Dummy test", () => {
 
       expect(status).toEqual(400);
       expect(json.errors).toEqual(["email not valid"]);
+    });
+
+    it("fails if password length is less than 8 characters", async () => {
+      const res = await request(app)
+        .post("/users")
+        .send({
+          ...MOCK_USER,
+          password: 'pass',
+        });
+
+      const { status, text } = res;
+      const json = JSON.parse(text);
+
+      expect(status).toEqual(400);
+      expect(json.errors).toEqual(["password must have 8 or more characters"]);
     });
   });
 });
