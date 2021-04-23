@@ -45,6 +45,10 @@ app.post('/users', async (req, res) => {
 
   const db = await getDb()
 
+  if (!req.body.password || typeof req.body.password !== 'string' || req.body.password.length < 8) {
+    return res.status(400).json({ errors: ['password must have 8 or more characters'] })
+  }
+
   const isUsernameAlreadyUsed = await db.collection('users').findOne({ username: req.body.username })
   if (isUsernameAlreadyUsed) {
     return res.status(400).json({ errors: ['username already in use'] })
