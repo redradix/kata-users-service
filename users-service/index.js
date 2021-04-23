@@ -1,5 +1,11 @@
-const app = require('./api')
+const App = require('./api')
 
-app.listen(3000, () => {
-  console.log('Server running...')
-})
+const main = async () => {
+  const app = App()
+
+  app.listen(3000, () => {
+    console.log('Server running...')
+  })
+}
+
+main()

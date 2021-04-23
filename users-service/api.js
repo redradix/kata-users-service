@@ -3,69 +3,74 @@ const bodyParser = require('body-parser')
 
 const getDb = require('./db')
 
-const app = express()
-app.use(bodyParser.json())
+const App = () => {
 
-app.get('/', (req, res) => {
-  return res.json({ message: 'aupa ahi' })
-})
+  const app = express()
+  app.use(bodyParser.json())
 
-app.get('/samples', async (req, res) => {
-  console.log('GET /samples')
+  app.get('/', (req, res) => {
+    return res.json({ message: 'aupa ahi' })
+  })
 
-  const db = await getDb()
-  const cursor = db.collection('samples').find()
-  const items = await cursor.toArray()
-  return res.json({ items })
-})
+  app.get('/samples', async (req, res) => {
+    console.log('GET /samples')
 
-app.post('/samples', async (req, res) => {
-  console.log('POST /samples', req.body)
+    const db = await getDb()
+    const cursor = db.collection('samples').find()
+    const items = await cursor.toArray()
+    return res.json({ items })
+  })
 
-  const db = await getDb()
-  const {
-    insertedCount,
-    insertedId,
-    result
-  } = await db.collection('samples').insertOne(req.body)
-  return res.json({ insertedCount, insertedId, result })
-})
+  app.post('/samples', async (req, res) => {
+    console.log('POST /samples', req.body)
 
-app.delete('/samples', async (req, res) => {
-  console.log('DELETE /samples')
+    const db = await getDb()
+    const {
+      insertedCount,
+      insertedId,
+      result
+    } = await db.collection('samples').insertOne(req.body)
+    return res.json({ insertedCount, insertedId, result })
+  })
 
-  const db = await getDb()
-  const { deletedCount, result } = await db.collection('samples').deleteMany({})
+  app.delete('/samples', async (req, res) => {
+    console.log('DELETE /samples')
 
-  return res.json({ deletedCount, result })
-})
+    const db = await getDb()
+    const { deletedCount, result } = await db.collection('samples').deleteMany({})
 
-app.post('/users', async (req, res) => {
-  console.log('POST /users', req.body)
+    return res.json({ deletedCount, result })
+  })
 
-  const db = await getDb()
+  app.post('/users', async (req, res) => {
+    console.log('POST /users', req.body)
 
-  const errors = []
+    const db = await getDb()
 
-  if (!req.body.password || typeof req.body.password !== 'string' || req.body.password.length < 8) {
-    errors.push('password must have 8 or more characters')
-  }
+    const errors = []
 
-  if (!req.body.email || typeof req.body.email !== 'string' || !req.body.email.includes('@') || !req.body.email.includes('.')) {
-    errors.push('email not valid')
-  }
+    if (!req.body.password || typeof req.body.password !== 'string' || req.body.password.length < 8) {
+      errors.push('password must have 8 or more characters')
+    }
 
-  if (errors.length) {
-    return res.status(400).json({ errors })
-  }
+    if (!req.body.email || typeof req.body.email !== 'string' || !req.body.email.includes('@') || !req.body.email.includes('.')) {
+      errors.push('email not valid')
+    }
 
-  const isUsernameAlreadyUsed = await db.collection('users').findOne({ username: req.body.username })
-  if (isUsernameAlreadyUsed) {
-    return res.status(400).json({ errors: ['username already in use'] })
-  }
+    if (errors.length) {
+      return res.status(400).json({ errors })
+    }
 
-  const { insertedId } = await db.collection('users').insertOne(req.body)
-  return res.json({ message: 'user created', id: insertedId })
-})
+    const isUsernameAlreadyUsed = await db.collection('users').findOne({ username: req.body.username })
+    if (isUsernameAlreadyUsed) {
+      return res.status(400).json({ errors: ['username already in use'] })
+    }
 
-module.exports = app
+    const { insertedId } = await db.collection('users').insertOne(req.body)
+    return res.json({ message: 'user created', id: insertedId })
+  })
+
+  return app
+}
+
+module.exports = App

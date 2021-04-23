@@ -1,10 +1,14 @@
 const request = require('supertest')
 
-const app = require('./api')
+const App = require('./api')
 const getDb = require('./db')
 
 
 describe('Dummy test', () => {
+  const getAgent = () => {
+    const app = App()
+    return request.agent(app)
+  }
 
   afterEach(async () => {
     const db = await getDb('production')
@@ -12,7 +16,7 @@ describe('Dummy test', () => {
   })
 
   it('GET /', async () => {
-    const res = await request(app).get('/')
+    const res = await getAgent().get('/')
 
     const { status, text } = res
 
@@ -27,7 +31,7 @@ describe('Dummy test', () => {
         email: 'aaron@redradix.com',
         password: 'mypassword'
       }
-      const res = await request(app).post('/users').send(payload)
+      const res = await getAgent().post('/users').send(payload)
 
       const { status, text } = res
       const body = JSON.parse(text)
@@ -43,8 +47,8 @@ describe('Dummy test', () => {
         email: 'aaron@redradix.com',
         password: 'mypassword'
       }
-      await request(app).post('/users').send(payload)
-      const res = await request(app).post('/users').send(payload)
+      await getAgent().post('/users').send(payload)
+      const res = await getAgent().post('/users').send(payload)
 
       const { status, text } = res
       const body = JSON.parse(text)
@@ -61,7 +65,7 @@ describe('Dummy test', () => {
         email: 'aaron@redradix.com',
         password: '123'
       }
-      const res = await request(app).post('/users').send(payload)
+      const res = await getAgent().post('/users').send(payload)
 
       const { status, text } = res
       const body = JSON.parse(text)
@@ -78,8 +82,8 @@ describe('Dummy test', () => {
         email: 'aaron',
         password: 'mypassword'
       }
-      await request(app).post('/users').send(payload)
-      const res = await request(app).post('/users').send(payload)
+      await getAgent().post('/users').send(payload)
+      const res = await getAgent().post('/users').send(payload)
 
       const { status, text } = res
       const body = JSON.parse(text)
@@ -96,8 +100,8 @@ describe('Dummy test', () => {
         email: 'aaron',
         password: '123'
       }
-      await request(app).post('/users').send(payload)
-      const res = await request(app).post('/users').send(payload)
+      await getAgent().post('/users').send(payload)
+      const res = await getAgent().post('/users').send(payload)
 
       const { status, text } = res
       const body = JSON.parse(text)
