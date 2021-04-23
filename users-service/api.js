@@ -45,12 +45,18 @@ app.post('/users', async (req, res) => {
 
   const db = await getDb()
 
+  const errors = []
+
   if (!req.body.password || typeof req.body.password !== 'string' || req.body.password.length < 8) {
-    return res.status(400).json({ errors: ['password must have 8 or more characters'] })
+    errors.push('password must have 8 or more characters')
   }
 
   if (!req.body.email || typeof req.body.email !== 'string' || !req.body.email.includes('@') || !req.body.email.includes('.')) {
-    return res.status(400).json({ errors: ['email not valid'] })
+    errors.push('email not valid')
+  }
+
+  if (errors.length) {
+    return res.status(400).json({ errors })
   }
 
   const isUsernameAlreadyUsed = await db.collection('users').findOne({ username: req.body.username })
