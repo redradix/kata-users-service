@@ -6,7 +6,7 @@ const client = new MongoClient(URL, {
   useUnifiedTopology: true
 })
 
-async function getDb(name = 'production') {
+async function connectDb(name = 'production') {
   try {
     await client.connect()
     return client.db(name)
@@ -16,4 +16,4 @@ async function getDb(name = 'production') {
   }
 }
 
-module.exports = getDb
+module.exports = connectDb

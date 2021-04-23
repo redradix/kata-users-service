@@ -1,9 +1,7 @@
 const express = require('express')
 const bodyParser = require('body-parser')
 
-const getDb = require('./db')
-
-const App = () => {
+const App = (db) => {
 
   const app = express()
   app.use(bodyParser.json())
@@ -15,7 +13,6 @@ const App = () => {
   app.get('/samples', async (req, res) => {
     console.log('GET /samples')
 
-    const db = await getDb()
     const cursor = db.collection('samples').find()
     const items = await cursor.toArray()
     return res.json({ items })
@@ -24,7 +21,6 @@ const App = () => {
   app.post('/samples', async (req, res) => {
     console.log('POST /samples', req.body)
 
-    const db = await getDb()
     const {
       insertedCount,
       insertedId,
@@ -36,7 +32,6 @@ const App = () => {
   app.delete('/samples', async (req, res) => {
     console.log('DELETE /samples')
 
-    const db = await getDb()
     const { deletedCount, result } = await db.collection('samples').deleteMany({})
 
     return res.json({ deletedCount, result })
@@ -45,7 +40,6 @@ const App = () => {
   app.post('/users', async (req, res) => {
     console.log('POST /users', req.body)
 
-    const db = await getDb()
 
     const errors = []
 

@@ -1,22 +1,28 @@
 const request = require('supertest')
 
 const App = require('./api')
-const getDb = require('./db')
+const connectDb = require('./db')
 
+const getAgent = async (dbConnection) => {
+  const app = App(dbConnection)
+  return request.agent(app)
+}
 
-describe('Dummy test', () => {
-  const getAgent = () => {
-    const app = App()
-    return request.agent(app)
-  }
+describe('Dummy test', async () => {
+  let dbConnection
+  let agent
+
+  beforeEach(async () => {
+    dbConnection = await connectDb()
+    agent = await getAgent(dbConnection)
+  })
 
   afterEach(async () => {
-    const db = await getDb('production')
-    db.collection('users').removeMany({})
+    dbConnection.collection('users').removeMany({})
   })
 
   it('GET /', async () => {
-    const res = await getAgent().get('/')
+    const res = await agent.get('/')
 
     const { status, text } = res
 
@@ -31,7 +37,7 @@ describe('Dummy test', () => {
         email: 'aaron@redradix.com',
         password: 'mypassword'
       }
-      const res = await getAgent().post('/users').send(payload)
+      const res = await agent.post('/users').send(payload)
 
       const { status, text } = res
       const body = JSON.parse(text)
@@ -47,8 +53,8 @@ describe('Dummy test', () => {
         email: 'aaron@redradix.com',
         password: 'mypassword'
       }
-      await getAgent().post('/users').send(payload)
-      const res = await getAgent().post('/users').send(payload)
+      await agent.post('/users').send(payload)
+      const res = await agent.post('/users').send(payload)
 
       const { status, text } = res
       const body = JSON.parse(text)
@@ -65,7 +71,7 @@ describe('Dummy test', () => {
         email: 'aaron@redradix.com',
         password: '123'
       }
-      const res = await getAgent().post('/users').send(payload)
+      const res = await agent.post('/users').send(payload)
 
       const { status, text } = res
       const body = JSON.parse(text)
@@ -82,8 +88,8 @@ describe('Dummy test', () => {
         email: 'aaron',
         password: 'mypassword'
       }
-      await getAgent().post('/users').send(payload)
-      const res = await getAgent().post('/users').send(payload)
+      await agent.post('/users').send(payload)
+      const res = await agent.post('/users').send(payload)
 
       const { status, text } = res
       const body = JSON.parse(text)
@@ -100,8 +106,8 @@ describe('Dummy test', () => {
         email: 'aaron',
         password: '123'
       }
-      await getAgent().post('/users').send(payload)
-      const res = await getAgent().post('/users').send(payload)
+      await agent.post('/users').send(payload)
+      const res = await agent.post('/users').send(payload)
 
       const { status, text } = res
       const body = JSON.parse(text)
