@@ -1,13 +1,13 @@
-const findUserByUsername = async (dataLayer, username) => {
-  const db = dataLayer.getDb();
+const findUserByUsername = async (connection, username) => {
+  const db = connection.getDb();
 
   return await db
     .collection("users")
     .findOne({ username: { $eq: username } });
 }
 
-const createUser = async (dataLayer, username) => {
-  const db = dataLayer.getDb();
+const createUser = async (connection, username) => {
+  const db = connection.getDb();
 
   return await db.collection("users").insertOne({ username });
 }
