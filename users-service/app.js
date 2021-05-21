@@ -27,10 +27,16 @@ const makeApp = (usersService) => {
       return res.status(400).json({ errors: ["username already in use"] });
     }
 
-    const { insertedId } = await usersService.createUser(username);
+    const { insertedId } = await usersService.createUser({ username, email });
 
     return res.status(200).json({ message: "user created", id: insertedId });
   });
+
+  app.get("/users", async (req, res) => {
+    const users = await usersService.getAll()
+
+    return res.status(200).json(users)
+  })
 
   return app
 }
