@@ -32,16 +32,14 @@ app.post("/samples", async (req, res) => {
 const REGEX_CHECK_EMAIL = /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/
 
 app.post("/users", async (req, res) => {
-  const username = req.body.username;
-  const email = req.body.email;
-  const password = req.body.password;
+  const { username, email, password } = req.body;
 
   const errors = [
-    !username ? "username is not provided" : undefined,
-    !email ? "email is not provided" : undefined,
-    email && !REGEX_CHECK_EMAIL.test(email) ? "email not valid" : undefined,
-    !password || password.length < 8 ? "password must have 8 or more characters" : undefined,
-  ].filter(x => x !== undefined)
+    !username && "username is not provided",
+    !email && "email is not provided",
+    email && !REGEX_CHECK_EMAIL.test(email) && "email not valid",
+    (!password || password.length < 8) && "password must have 8 or more characters",
+  ].filter(x => x !== false)
 
   if (errors.length > 0) {
     return res.status(400).json({ errors });
