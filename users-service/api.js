@@ -3,6 +3,11 @@ const bodyParser = require("body-parser");
 
 const getDb = require("./db");
 
+const {
+  findUserByUsername,
+  createUser,
+} = require('./users')
+
 const app = express();
 app.use(bodyParser.json());
 
@@ -45,16 +50,13 @@ app.post("/users", async (req, res) => {
     return res.status(400).json({ errors });
   }
 
-  const db = await getDb();
-  const foundUser = await db
-    .collection("users")
-    .findOne({ username: { $eq: username } });
+  const foundUser = await findUserByUsername(username);
 
   if (foundUser) {
     return res.status(400).json({ errors: ["username already in use"] });
   }
 
-  const { insertedId } = await db.collection("users").insertOne({ username });
+  const { insertedId } = await createUser(username);
 
   return res.status(200).json({ message: "user created", id: insertedId });
 });
