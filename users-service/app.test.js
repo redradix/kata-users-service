@@ -1,7 +1,7 @@
 const request = require("supertest");
 
-const app = require("./api");
-const getDb = require("./db");
+const { makeApp } = require("./app");
+const { connect } = require("./db");
 
 const MOCK_USER = {
   username: "john",
@@ -10,9 +10,20 @@ const MOCK_USER = {
 }
 
 describe('user creation', () => {
+  let connection, app
+
+  beforeAll(async () => {
+    connection = await connect()
+    app = makeApp(connection)
+  })
+
   afterEach(async () => {
-    (await getDb()).collection("users").removeMany({});
+    await connection.getDb().collection("users").removeMany({});
   });
+
+  afterAll(async () => {
+    await connection.close()
+  })
 
   it("create a new user", async () => {
     const res = await request(app)

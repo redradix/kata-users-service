@@ -1,5 +1,15 @@
-const app = require('./api')
+const { makeApp } = require('./app')
+const { connect } = require('./db')
 
-app.listen(3000, () => {
-  console.log('Server running...')
+async function main() {
+  const connection = await connect()
+  const app = makeApp(connection)
+
+  app.listen(3000, () => {
+    console.log('Server running...')
+  })
+}
+
+main().catch(err => {
+  console.error(err)
 })
