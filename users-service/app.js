@@ -1,12 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 
-const {
-  findUserByUsername,
-  createUser,
-} = require('./users');
-
-const makeApp = (connection) => {
+const makeApp = (usersService) => {
   const app = express();
   app.use(bodyParser.json());
 
@@ -26,13 +21,13 @@ const makeApp = (connection) => {
       return res.status(400).json({ errors });
     }
 
-    const foundUser = await findUserByUsername(connection, username);
+    const foundUser = await usersService.findUserByUsername(username);
 
     if (foundUser) {
       return res.status(400).json({ errors: ["username already in use"] });
     }
 
-    const { insertedId } = await createUser(connection, username);
+    const { insertedId } = await usersService.createUser(username);
 
     return res.status(200).json({ message: "user created", id: insertedId });
   });

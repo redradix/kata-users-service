@@ -2,6 +2,7 @@ const request = require("supertest");
 
 const { makeApp } = require("./app");
 const { connect } = require("./db");
+const createUsersService = require("./users")
 
 const MOCK_USER = {
   username: "john",
@@ -10,11 +11,12 @@ const MOCK_USER = {
 }
 
 describe('user creation', () => {
-  let connection, app
+  let connection, usersService, app
 
   beforeAll(async () => {
     connection = await connect()
-    app = makeApp(connection)
+    usersService = createUsersService(connection)
+    app = makeApp(usersService)
   })
 
   afterEach(async () => {

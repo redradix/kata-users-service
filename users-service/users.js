@@ -1,18 +1,23 @@
-const findUserByUsername = async (connection, username) => {
-  const db = connection.getDb();
+function createUsersService(connection) {
 
-  return await db
-    .collection("users")
-    .findOne({ username: { $eq: username } });
+  const findUserByUsername = async (username) => {
+    const db = connection.getDb();
+
+    return await db
+      .collection("users")
+      .findOne({ username: { $eq: username } });
+  }
+
+  const createUser = async (username) => {
+    const db = connection.getDb();
+
+    return await db.collection("users").insertOne({ username });
+  }
+
+  return {
+    findUserByUsername,
+    createUser
+  }
 }
 
-const createUser = async (connection, username) => {
-  const db = connection.getDb();
-
-  return await db.collection("users").insertOne({ username });
-}
-
-module.exports = {
-  findUserByUsername,
-  createUser,
-}
+module.exports = createUsersService
