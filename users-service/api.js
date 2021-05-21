@@ -33,25 +33,18 @@ const REGEX_CHECK_EMAIL = /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=
 
 app.post("/users", async (req, res) => {
   const username = req.body.username;
-
-  if (!username) {
-    return res.status(400).json({ errors: ["username is not provided"] });
-  }
-
   const email = req.body.email;
-
-  if (!email) {
-    return res.status(400).json({ errors: ["email is not provided"] });
-  }
-
-  if (!REGEX_CHECK_EMAIL.test(email)) {
-    return res.status(400).json({ errors: ["email not valid"] });
-  }
-
   const password = req.body.password;
 
-  if (password.length < 8) {
-    return res.status(400).json({ errors: ["password must have 8 or more characters"] });
+  const errors = [
+    !username ? "username is not provided" : undefined,
+    !email ? "email is not provided" : undefined,
+    email && !REGEX_CHECK_EMAIL.test(email) ? "email not valid" : undefined,
+    !password || password.length < 8 ? "password must have 8 or more characters" : undefined,
+  ].filter(x => x !== undefined)
+
+  if (errors.length > 0) {
+    return res.status(400).json({ errors });
   }
 
   const db = await getDb();
