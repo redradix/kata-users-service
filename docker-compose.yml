@@ -5,13 +5,13 @@ services:
     container_name: users_service
     build: ./users-service
     command: npx nodemon index.js
+    depends_on: 
+      - db
     volumes:
       - ./users-service:/app
       - /app/node_modules
     ports:
       - "3000:3000"
-    external_links:
-      - db
   db:
     container_name: users_db
     image: mongo
