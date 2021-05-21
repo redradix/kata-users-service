@@ -9,119 +9,108 @@ const MOCK_USER = {
   password: 'password'
 }
 
-describe("Dummy test", () => {
+describe('user creation', () => {
   afterEach(async () => {
     (await getDb()).collection("users").removeMany({});
   });
 
-  it("GET /", async () => {
-    const res = await request(app).get("/");
+  it("create a new user", async () => {
+    const res = await request(app)
+      .post("/users")
+      .send(MOCK_USER);
+
+    const { status, text } = res;
+    const json = JSON.parse(text);
+
+    expect(status).toEqual(200);
+    expect(json.id).toBeDefined();
+    expect(json.message).toEqual("user created");
+  });
+
+  it("fails if username is not provided", async () => {
+    const res = await request(app).post("/users");
 
     const { status, text } = res;
 
-    expect(status).toEqual(200);
-    expect(JSON.parse(text)).toEqual({ message: "aupa ahi" });
+    const json = JSON.parse(text);
+
+    expect(status).toEqual(400);
+    expect(json.errors).toEqual(
+      expect.arrayContaining(["username is not provided"])
+    );
   });
 
-  describe('user creation', () => {
-    it("create a new user", async () => {
-      const res = await request(app)
-        .post("/users")
-        .send(MOCK_USER);
+  it("fails if username is already in use", async () => {
+    await request(app)
+      .post("/users")
+      .send(MOCK_USER);
 
-      const { status, text } = res;
-      const json = JSON.parse(text);
+    const res = await request(app)
+      .post("/users")
+      .send(MOCK_USER);
 
-      expect(status).toEqual(200);
-      expect(json.id).toBeDefined();
-      expect(json.message).toEqual("user created");
-    });
+    const { status, text } = res;
+    const json = JSON.parse(text);
 
-    it("fails if username is not provided", async () => {
-      const res = await request(app).post("/users");
+    expect(status).toEqual(400);
+    expect(json.errors).toEqual(
+      expect.arrayContaining(["username already in use"])
+    );
+  });
 
-      const { status, text } = res;
+  it("fails if email format is not valid", async () => {
+    const res = await request(app)
+      .post("/users")
+      .send({
+        ...MOCK_USER,
+        email: 'bademail',
+      });
 
-      const json = JSON.parse(text);
+    const { status, text } = res;
+    const json = JSON.parse(text);
 
-      expect(status).toEqual(400);
-      expect(json.errors).toEqual(
-        expect.arrayContaining(["username is not provided"])
+    expect(status).toEqual(400);
+    expect(json.errors).toEqual(
+      expect.arrayContaining(["email not valid"])
+    );
+  });
+
+  it("fails if password length is less than 8 characters", async () => {
+    const res = await request(app)
+      .post("/users")
+      .send({
+        ...MOCK_USER,
+        password: 'pass',
+      });
+
+    const { status, text } = res;
+    const json = JSON.parse(text);
+
+    expect(status).toEqual(400);
+    expect(json.errors).toEqual(
+      expect.arrayContaining(["password must have 8 or more characters"])
+    );
+  });
+
+  it("returns all applicable errors if many happen in parallel", async () => {
+    const res = await request(app)
+      .post("/users")
+      .send({
+        email: 'not an email',
+        password: 'lol',
+      });
+
+    const { status, text } = res;
+    const json = JSON.parse(text);
+
+    expect(status).toEqual(400);
+    expect(json.errors).toHaveLength(3)
+    expect(json.errors).toEqual(
+        expect.arrayContaining([
+          "username is not provided",
+          "email not valid",
+          "password must have 8 or more characters",
+        ])
       );
-    });
-
-    it("fails if username is already in use", async () => {
-      await request(app)
-        .post("/users")
-        .send(MOCK_USER);
-
-      const res = await request(app)
-        .post("/users")
-        .send(MOCK_USER);
-
-      const { status, text } = res;
-      const json = JSON.parse(text);
-
-      expect(status).toEqual(400);
-      expect(json.errors).toEqual(
-        expect.arrayContaining(["username already in use"])
-      );
-    });
-
-    it("fails if email format is not valid", async () => {
-      const res = await request(app)
-        .post("/users")
-        .send({
-          ...MOCK_USER,
-          email: 'bademail',
-        });
-
-      const { status, text } = res;
-      const json = JSON.parse(text);
-
-      expect(status).toEqual(400);
-      expect(json.errors).toEqual(
-        expect.arrayContaining(["email not valid"])
-      );
-    });
-
-    it("fails if password length is less than 8 characters", async () => {
-      const res = await request(app)
-        .post("/users")
-        .send({
-          ...MOCK_USER,
-          password: 'pass',
-        });
-
-      const { status, text } = res;
-      const json = JSON.parse(text);
-
-      expect(status).toEqual(400);
-      expect(json.errors).toEqual(
-        expect.arrayContaining(["password must have 8 or more characters"])
-      );
-    });
-
-    it("returns all applicable errors if many happen in parallel", async () => {
-      const res = await request(app)
-        .post("/users")
-        .send({
-          email: 'not an email',
-          password: 'lol',
-        });
-
-      const { status, text } = res;
-      const json = JSON.parse(text);
-
-      expect(status).toEqual(400);
-      expect(json.errors).toHaveLength(3)
-      expect(json.errors).toEqual(
-          expect.arrayContaining([
-            "username is not provided",
-            "email not valid",
-            "password must have 8 or more characters",
-          ])
-        );
-    });
   });
 });
